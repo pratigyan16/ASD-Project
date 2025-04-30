@@ -1,0 +1,91 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# === Load and clean dataset ===
+df = pd.read_csv("toddler_asd.csv")
+df.columns = df.columns.str.strip()  # Remove leading/trailing spaces from column names
+
+# Check the column names
+print("Dataset Columns:", df.columns.tolist())
+
+# Set the correct target column
+target_column = 'Class/ASD Traits'
+
+# Drop irrelevant columns (optional)
+df = df.drop(columns=['Case_No', 'Who completed the test'], errors='ignore')
+
+# Encode non-numeric/categorical columns
+for col in df.select_dtypes(include='object').columns:
+    df[col] = pd.factorize(df[col])[0]
+
+# Separate features and labels
+X = df.drop(target_column, axis=1).values
+y = df[target_column].values
+
+# === Manual train/test split ===
+split_index = int(0.8 * len(X))
+X_train, X_test = X[:split_index], X[split_index:]
+y_train, y_test = y[:split_index], y[split_index:]
+
+# === Manual Gaussian Naive Bayes implementation ===
+class GaussianNaiveBayes:
+    def fit(self, X, y):
+        self.classes = np.unique(y)
+        self.mean = {}
+        self.var = {}
+        self.priors = {}
+
+        for c in self.classes:
+            X_c = X[y == c]
+            self.mean[c] = np.mean(X_c, axis=0)
+            self.var[c] = np.var(X_c, axis=0) + 1e-6
+            self.priors[c] = X_c.shape[0] / X.shape[0]
+
+    def predict(self, X):
+        return [self._predict_row(x) for x in X]
+
+    def _predict_row(self, x):
+        posteriors = []
+
+        for c in self.classes:
+            prior = np.log(self.priors[c])
+            class_conditional = np.sum(
+                -0.5 * np.log(2 * np.pi * self.var[c]) -
+                ((x - self.mean[c]) ** 2) / (2 * self.var[c])
+            )
+            posterior = prior + class_conditional
+            posteriors.append(posterior)
+
+        return self.classes[np.argmax(posteriors)]
+
+# === Train and predict ===
+model = GaussianNaiveBayes()
+model.fit(X_train, y_train)
+y_pred = model.predict(X_test)
+
+# === Evaluation ===
+def confusion_matrix_manual(y_true, y_pred):
+    TP = sum((y_true[i] == 1 and y_pred[i] == 1) for i in range(len(y_true)))
+    TN = sum((y_true[i] == 0 and y_pred[i] == 0) for i in range(len(y_true)))
+    FP = sum((y_true[i] == 0 and y_pred[i] == 1) for i in range(len(y_true)))
+    FN = sum((y_true[i] == 1 and y_pred[i] == 0) for i in range(len(y_true)))
+    return np.array([[TN, FP], [FN, TP]])
+
+cm = confusion_matrix_manual(y_test, y_pred)
+accuracy = np.mean(y_pred == y_test)
+
+print(f"\nAccuracy: {accuracy * 100:.2f}%")
+print("\nConfusion Matrix:")
+print(cm)
+
+# === Visualize Confusion Matrix ===
+sns.heatmap(cm, annot=True, fmt='d', cmap='coolwarm',
+            xticklabels=["Pred 0", "Pred 1"],
+            yticklabels=["Actual 0", "Actual 1"])
+plt.title("Naive Bayes (Manual) - ASD Detection")
+plt.xlabel("Predicted")
+plt.ylabel("Actual")
+plt.tight_layout()
+plt.show()
