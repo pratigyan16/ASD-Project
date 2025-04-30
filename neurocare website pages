@@ -1,0 +1,192 @@
+//base.html <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>NeuroCare</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header>
+    <h1>NeuroCare</h1>
+    <nav>
+      <a href="/">Home</a>
+      <a href="/diagnosis">Diagnosis</a>
+      <a href="/therapy">Therapy</a>
+      <a href="/funds">Funds</a>
+      <a href="/contact">Contact</a>
+    </nav>
+  </header>
+  <div class="container">
+    {% block content %}{% endblock %}
+  </div>
+  <footer>
+    &copy; 2025 NeuroCare. Empowering Lives with Smart Health.
+  </footer>
+</body>
+</html>
+
+<!-- chat.html -->
+{% extends "base.html" %}
+{% block content %}
+<h2>Chat with SmartCare Bot</h2>
+<form method="POST">
+    <div class="mb-3">
+        <label for="user_input" class="form-label">Ask your question:</label>
+        <input type="text" class="form-control" name="user_input" required>
+    </div>
+    <button type="submit" class="btn btn-success">Send</button>
+</form>
+
+{% if user_input %}
+    <div class="mt-4">
+        <p><strong>You:</strong> {{ user_input }}</p>
+        <p><strong>Bot:</strong> {{ bot_response }}</p>
+    </div>
+{% endif %}
+{% endblock %} 
+
+//contact.html
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Contact Us</h2>
+<p>Email: support@neurocare.org</p>
+<p>Phone: +1 (800) 123-4567</p>
+<p>We’re here to answer your questions and help you connect with the right resources.</p>
+{% endblock %}
+
+//diagnosis.html
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Diagnosis</h2>
+<p>
+  Answer the following Q-CHAT 10 questions to assess the likelihood of Autism Spectrum Disorder in toddlers.(using naive bayes model)
+</p>
+<form method="post" action="/diagnosis">
+  <label for="q1">1. Does your child look at you when you call his/her name?</label><br>
+  <input type="number" id="q1" name="q1" min="0" max="1" required><br><br>
+
+  <label for="q2">2. How easy is it for you to get eye contact with your child?</label><br>
+  <input type="number" id="q2" name="q2" min="0" max="1" required><br><br>
+
+  <label for="q3">3. Does your child point to indicate that s/he wants something?</label><br>
+  <input type="number" id="q3" name="q3" min="0" max="1" required><br><br>
+
+  <label for="q4">4. Does your child point to share interest with you?</label><br>
+  <input type="number" id="q4" name="q4" min="0" max="1" required><br><br>
+
+  <label for="q5">5. Does your child pretend?</label><br>
+  <input type="number" id="q5" name="q5" min="0" max="1" required><br><br>
+
+  <label for="q6">6. Does your child follow where you’re looking?</label><br>
+  <input type="number" id="q6" name="q6" min="0" max="1" required><br><br>
+
+  <label for="q7">7. If you or someone else in the family is visibly upset, does your child show signs of wanting to comfort them?</label><br>
+  <input type="number" id="q7" name="q7" min="0" max="1" required><br><br>
+
+  <label for="q8">8. Would you describe your child’s first words as typical in their development?</label><br>
+  <input type="number" id="q8" name="q8" min="0" max="1" required><br><br>
+
+  <label for="q9">9. Does your child use simple gestures such as nodding for “yes” and shaking head for “no”?</label><br>
+  <input type="number" id="q9" name="q9" min="0" max="1" required><br><br>
+
+  <label for="q10">10. Does your child look at things you are looking at?</label><br>
+  <input type="number" id="q10" name="q10" min="0" max="1" required><br><br>
+
+  <label for="months">Toddler Age (in months):</label><br>
+  <input type="number" id="months" name="months" required><br><br>
+
+  <input type="submit" value="Submit">
+</form>
+
+{% if result %}
+  <h3>Prediction Result:</h3>
+  <p>{{ result }}</p>
+{% endif %}
+{% endblock %}
+
+//funds.html
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Support NeuroCare</h2>
+<p>
+  Your contribution helps us provide better services and resources for autism care. Please fill in your details to donate.
+</p>
+
+<form method="post" action="/funds">
+  <label for="name">Name:</label><br>
+  <input type="text" id="name" name="name" required><br><br>
+
+  <label for="email">Email ID:</label><br>
+  <input type="email" id="email" name="email" required><br><br>
+
+  <label for="amount">Amount to Donate ($):</label><br>
+  <input type="number" id="amount" name="amount" required><br><br>
+
+  <label for="message">Message (optional):</label><br>
+  <textarea id="message" name="message" rows="4" cols="50"></textarea><br><br>
+
+  <input type="submit" value="Submit">
+</form>
+
+{% if confirmation %}
+  <h3>Thank you!</h3>
+  <p>We appreciate your support. More details will be shared with you at {{ confirmation.email }}.</p>
+{% endif %}
+{% endblock %}
+
+
+//index.html
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Welcome to NeuroCare: The Smart Health Care</h2>
+<p>
+  Autism Spectrum Disorder (ASD) is a neurological and developmental disorder that affects how people interact with others,
+  communicate, learn, and behave. It appears in early childhood and can impact daily functioning.
+</p>
+<p>
+  NeuroCare was created with a mission to bring smart healthcare solutions to individuals and families dealing with autism.
+  From early diagnosis tools to therapy guidance and supportive communities, our platform is here to help.
+</p>
+{% endblock %}
+
+//therapy.html
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Therapy Session Booking</h2>
+<p>
+  Please fill out the form below to request a therapy session. More details will be shared with you via email.
+</p>
+
+<form method="post" action="/therapy">
+  <label for="name">Name:</label><br>
+  <input type="text" id="name" name="name" required><br><br>
+
+  <label for="email">Email ID:</label><br>
+  <input type="email" id="email" name="email" required><br><br>
+
+  <label for="therapy">Type of Therapy:</label><br>
+  <select id="therapy" name="therapy">
+    <option value="speech">Speech Therapy</option>
+    <option value="behavioral">Behavioral Therapy</option>
+    <option value="occupational">Occupational Therapy</option>
+    <option value="social">Social Skills Therapy</option>
+  </select><br><br>
+
+  <label for="time">Preferred Time Slot:</label><br>
+  <input type="text" id="time" name="time" placeholder="e.g., Mondays 10-11 AM" required><br><br>
+
+  <input type="submit" value="Go">
+</form>
+
+{% if confirmation %}
+  <h3>Thank you!</h3>
+  <p>More details will be shared with you at {{ confirmation.email }}.</p>
+{% endif %}
+{% endblock %}
+
+
