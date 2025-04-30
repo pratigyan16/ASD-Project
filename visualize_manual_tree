@@ -1,0 +1,43 @@
+import matplotlib.pyplot as plt
+
+def draw_manual_tree():
+    fig, ax = plt.subplots(figsize=(12, 6))
+    ax.set_xlim(0, 10)
+    ax.set_ylim(0, 10)
+
+    # Node positions
+    nodes = {
+        'root': (5, 9),
+        'A1': (3, 6),
+        'A2': (7, 6),
+        'ASD': (2, 3),
+        'Not ASD': (4, 3),
+        'ASD2': (6, 3),
+        'Not ASD2': (8, 3)
+    }
+
+    edges = [
+        ('root', 'A1', 'Yes'),
+        ('root', 'A2', 'No'),
+        ('A1', 'ASD', 'Yes'),
+        ('A1', 'Not ASD', 'No'),
+        ('A2', 'ASD2', 'Yes'),
+        ('A2', 'Not ASD2', 'No')
+    ]
+
+    # Draw nodes
+    for node, (x, y) in nodes.items():
+        ax.text(x, y, node, ha='center', bbox=dict(boxstyle="round", facecolor='lightblue'))
+
+    # Draw edges
+    for start, end, label in edges:
+        x1, y1 = nodes[start]
+        x2, y2 = nodes[end]
+        ax.plot([x1, x2], [y1, y2], 'k-')
+        ax.text((x1 + x2) / 2, (y1 + y2) / 2, label, ha='center', va='center', fontsize=10, backgroundcolor='white')
+
+    ax.axis('off')
+    plt.title("Manual Visualization of Decision Tree")
+    plt.show()
+
+draw_manual_tree()
